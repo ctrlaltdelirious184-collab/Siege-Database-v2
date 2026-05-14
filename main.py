@@ -28,6 +28,7 @@ GOLD     = "#f59e0b"
 FONT     = ("Segoe UI", 10)
 FONT_B   = ("Segoe UI", 10, "bold")
 FONT_H   = ("Segoe UI", 14, "bold")
+ACCENT_BG = "#1e1b4b"
 FONT_SM  = ("Segoe UI", 9)
 FONT_LG  = ("Segoe UI", 13, "bold")
 
@@ -1250,6 +1251,7 @@ class SiegeApp(tk.Tk):
         self.minsize(1000, 600)
         self.configure(bg=BG)
         self.protocol("WM_DELETE_WINDOW", self._on_closing)
+        self.current_tab = None
         self._build_ui()
         # Start live ingest server
         self._server_ok = ingest_server.start(
@@ -1417,6 +1419,7 @@ class SiegeApp(tk.Tk):
         self.pages[name].pack(fill="both", expand=True)
         # Active tab: brighter bg + accent underline effect via fg color
         self.tab_btns[name].config(bg=PANEL, fg=ACCENT)
+        self.current_tab = name
         if name == "Dashboard":
             self.dashboard.refresh()
 
