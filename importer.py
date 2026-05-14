@@ -188,10 +188,11 @@ def import_battles_from_logs(log_dir: str = SWEX_FILES_PATH) -> tuple[int, int]:
             while len(def_names) < 3: def_names.append("")
             while len(off_names) < 3: off_names.append("")
 
-            # Get or create defense
-            def_key = tuple(sorted(def_names))
+            # Get or create defense (Guild-Aware)
+            guild = battle.get("guild_name") or "Unknown"
+            def_key = (guild, tuple(sorted(def_names)))
             if def_key not in def_by_comp:
-                db.add_defense("", def_names[0], def_names[1], def_names[2], "Auto-imported")
+                db.add_defense(guild, def_names[0], def_names[1], def_names[2], "Auto-imported")
                 def_id = db.get_defenses()[0]["id"]
                 def_by_comp[def_key] = def_id
             def_id = def_by_comp[def_key]
@@ -240,11 +241,11 @@ def import_battles_from_siege_logs(log_dir: str = SWEX_FILES_PATH, my_wizard_nam
     if not log_files:
         return 0, 0
 
-    # Build lookup maps
+    # Build lookup maps (Guild-Aware)
     def_by_comp = {}
     for row in db.get_defenses():
-        key = tuple(sorted([row["monster1"] or "", row["monster2"] or "", row["monster3"] or ""]))
-        def_by_comp[key] = row["id"]
+        comp_key = tuple(sorted([row["monster1"] or "", row["monster2"] or "", row["monster3"] or ""]))
+        def_by_comp[(row["label"], comp_key)] = row["id"]
 
     off_by_comp = {}
     for row in db.get_offenses():
@@ -309,16 +310,16 @@ def import_battles_from_siege_logs(log_dir: str = SWEX_FILES_PATH, my_wizard_nam
                         off_by_comp[off_key] = off_id
                     off_id = off_by_comp[off_key]
 
-                    # Get or create defense (enemy team)
-                    def_key = tuple(sorted(opp_names))
+                    # Get or create defense (enemy team) - Guild-Aware
+                    opp_guild = entry.get("opp_guild_name", "Unknown").strip()
+                    def_key = (opp_guild, tuple(sorted(opp_names)))
                     if def_key not in def_by_comp:
-                        db.add_defense("", opp_names[0], opp_names[1], opp_names[2], "Auto-imported from siege log")
+                        db.add_defense(opp_guild, opp_names[0], opp_names[1], opp_names[2], "Auto-imported from siege log")
                         def_id = db.get_defenses()[0]["id"]
                         def_by_comp[def_key] = def_id
                     def_id = def_by_comp[def_key]
 
                     result = "Win" if entry.get("win_lose") == 1 else "Loss"
-                    opp_guild = entry.get("opp_guild_name", "Unknown").strip()
 
                     # Convert log timestamp to date string for matching
                     import datetime
@@ -345,16 +346,16 @@ def import_battles_from_siege_logs(log_dir: str = SWEX_FILES_PATH, my_wizard_nam
     return imported, skipped
 
 
-def get_or_create_defense(monster_names, note="Auto-imported"):
-    """Check if a defense exists, if not create it. Returns def_id."""
+def get_or_create_defense(monster_names, guild_name="Unknown", note="Auto-imported"):
+    """Check if a defense exists (matching Guild + Monsters), if not create it. Returns def_id."""
     def_by_comp = {}
     for row in db.get_defenses():
-        key = tuple(sorted([row["monster1"] or "", row["monster2"] or "", row["monster3"] or ""]))
-        def_by_comp[key] = row["id"]
+        comp_key = tuple(sorted([row["monster1"] or "", row["monster2"] or "", row["monster3"] or ""]))
+        def_by_comp[(row["label"], comp_key)] = row["id"]
 
-    def_key = tuple(sorted(monster_names))
+    def_key = (guild_name, tuple(sorted(monster_names)))
     if def_key not in def_by_comp:
-        db.add_defense("", monster_names[0], monster_names[1], monster_names[2], note)
+        db.add_defense(guild_name, monster_names[0], monster_names[1], monster_names[2], note)
         return db.get_defenses()[0]["id"]
     return def_by_comp[def_key]
 
@@ -415,7 +416,7 @@ def process_discovery(cmd_type: str, data: dict) -> int:
             while len(m_names) < 3: m_names.append("")
             
             if m_names[0]:
-                get_or_create_defense(m_names, f"Discovered via {cmd_type} (Guild: {guild_name})")
+                get_or_create_defense(m_names, guild_name, f"Discovered via {cmd_type} (Guild: {guild_name})")
                 count += 1
 
     return count
@@ -472,11 +473,12 @@ def process_live_battle(entry: dict, wizard_name: str = "") -> dict:
     # Update guild cache if we see guild info in the battle log
     update_guild_cache(entry)
     
+    opp_guild = (entry.get("opp_guild_name") or "Unknown").strip()
+    
     # Get or create defense (enemy team) using the helper
-    def_id = get_or_create_defense(opp_names, "Auto-imported from live plugin")
+    def_id = get_or_create_defense(opp_names, opp_guild, "Auto-imported from live plugin")
 
     result    = "Win" if entry.get("win_lose") == 1 else "Loss"
-    opp_guild = (entry.get("opp_guild_name") or "Unknown").strip()
     note      = f"siege_log_id:{log_id}" if log_id else "live-import"
 
     db.add_battle(def_id, off_id, result, opp_guild, note)

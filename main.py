@@ -31,6 +31,55 @@ FONT_H   = ("Segoe UI", 14, "bold")
 FONT_SM  = ("Segoe UI", 9)
 FONT_LG  = ("Segoe UI", 13, "bold")
 
+# ── Components ───────────────────────────────────────────
+
+class DonutChart(tk.Canvas):
+    def __init__(self, parent, size=80, bg=BG):
+        super().__init__(parent, width=size, height=size, bg=bg, highlightthickness=0)
+        self.size = size
+        self.bg = bg
+        self.wins = 0
+        self.total = 0
+        self.cur_extent = 0
+        self._anim_id = None
+
+    def update_stats(self, wins, total):
+        self.wins = wins
+        self.total = total
+        target_extent = (self.wins / self.total * 359.9) if total > 0 else 0
+        self._animate(target_extent)
+
+    def _animate(self, target):
+        if self._anim_id: self.after_cancel(self._anim_id)
+        diff = target - self.cur_extent
+        if abs(diff) < 0.5:
+            self.cur_extent = target
+            self.draw()
+            return
+            
+        self.cur_extent += diff * 0.15 # Smooth spring physics
+        self.draw()
+        self._anim_id = self.after(16, lambda: self._animate(target))
+
+    def draw(self):
+        self.delete("all")
+        cx, cy = self.size / 2, self.size / 2
+        r = (self.size / 2) - 6
+        
+        # Background ring (Dark track)
+        self.create_oval(cx-r, cy-r, cx+r, cy+r, outline=CARD, width=10)
+        
+        if self.total > 0 or self.cur_extent > 1:
+            # Win arc (Animated)
+            self.create_arc(cx-r, cy-r, cx+r, cy+r, start=90, extent=-self.cur_extent, 
+                            outline=WIN_CLR, width=10, style="arc")
+            
+            # Percentage text
+            pct = int((self.wins / self.total) * 100) if self.total > 0 else 0
+            self.create_text(cx, cy, text=f"{pct}%", fill=FG, font=("Segoe UI", 11, "bold"))
+        else:
+            self.create_text(cx, cy, text="—", fill=FG2, font=("Segoe UI", 11, "bold"))
+
 # ── Helpers ───────────────────────────────────────────────
 _HOVER = {ACCENT: ACCENT_H, ACCENT2: ACCENT2H, WIN_CLR: WIN_H, LOSS_CLR: LOSS_H}
 
@@ -272,7 +321,17 @@ class RecordDialog(tk.Toplevel):
         tk.Frame(self, bg=BORDER, height=1).pack(fill="x", padx=24, pady=(0,8))
         self.mg = MonsterGroup(self, show_label=show_label, label_text=label_text)
         self.mg.pack(padx=24, pady=8, fill="x")
-        if initial: self.mg.set(*initial)
+        
+        # Tier Selector
+        self.tier_var = tk.StringVar(value=initial[5] if (initial and len(initial) > 5) else "5*")
+        tf = tk.Frame(self, bg=BG); tf.pack(fill="x", padx=24, pady=4)
+        tk.Label(tf, text="Tier:", bg=BG, fg=FG2, font=FONT_SM).pack(side="left")
+        for t in ["5*", "4*"]:
+            tk.Radiobutton(tf, text=t, variable=self.tier_var, value=t,
+                           bg=BG, fg=FG, selectcolor=SIDE, activebackground=BG,
+                           activeforeground=FG, font=FONT_SM).pack(side="left", padx=10)
+
+        if initial: self.mg.set(*initial[:5])
         bf = tk.Frame(self, bg=BG)
         bf.pack(pady=(8,20), padx=24, fill="x")
         styled_btn(bf, "Save", self._save, ACCENT).pack(side="right", padx=4)
@@ -283,7 +342,7 @@ class RecordDialog(tk.Toplevel):
         lbl, m1, m2, m3, notes = self.mg.get()
         if not m1:
             messagebox.showwarning("Missing", "Monster 1 is required.", parent=self); return
-        self.result = (lbl, m1, m2, m3, notes)
+        self.result = (lbl, m1, m2, m3, notes, self.tier_var.get())
         self.destroy()
 
 
@@ -357,20 +416,36 @@ class DefensesTab(tk.Frame):
 
         # ── Search + buttons row
         top = tk.Frame(self, bg=BG); top.pack(fill="x", padx=20, pady=10)
-        tk.Label(top, text="🔍", bg=BG, fg=FG2, font=FONT_B).pack(side="left")
+        tk.Label(top, text="🔍", bg=BG, fg=FG2, font=("Segoe UI", 12)).pack(side="left")
         self._search_var = tk.StringVar()
         self._search_var.trace_add("write", lambda *_: self._apply_filter())
         search_e = tk.Entry(top, textvariable=self._search_var, width=28,
                             bg=CARD, fg=FG, font=FONT, insertbackground=FG,
                             relief="flat", bd=4)
         search_e.pack(side="left", padx=(4, 16))
+        
+        # Tier Filter
+        self._tier_var = tk.StringVar(value="All")
+        for t in ["All", "5*", "4*"]:
+            rb = tk.Radiobutton(top, text=t, variable=self._tier_var, value=t,
+                                command=self._apply_filter, bg=CARD, fg=FG,
+                                selectcolor=SIDE, activebackground=ACCENT,
+                                activeforeground=FG, font=("Segoe UI", 8, "bold"), 
+                                indicatoron=False, width=6,
+                                padx=10, pady=2, bd=1, relief="flat")
+            rb.pack(side="left", padx=1)
+
+        tk.Frame(top, width=20, bg=BG).pack(side="left") # Spacer
+        
         styled_btn(top, "+ Add Defense", self._add, ACCENT).pack(side="left", padx=(0,8))
         styled_btn(top, "✏ Edit", self._edit, CARD).pack(side="left", padx=(0,8))
         styled_btn(top, "🗑 Delete", self._delete, "#6b2f2f").pack(side="left", padx=(0,8))
-        styled_btn(top, "🗑 Clear All", self._clear_all, "#4a1c1c", width=12).pack(side="left", padx=(0,16))
+        styled_btn(top, "🗑 Clear All", self._clear_all, "#4a1c1c", width=12).pack(side="left", padx=(16,16))
         
-        # Live Summary Label
-        self._summary_lbl = tk.Label(top, text="", bg=BG, fg=GOLD, font=FONT_B)
+        # Winrate Donut Chart
+        self._donut = DonutChart(top, size=80)
+        self._donut.pack(side="left", padx=10)
+        self._summary_lbl = tk.Label(top, text="FILTERED WR", bg=BG, fg=FG2, font=("Segoe UI", 7, "bold"))
         self._summary_lbl.pack(side="left")
 
         # ── Split: defense list (top) + offense breakdown (bottom)
@@ -423,16 +498,31 @@ class DefensesTab(tk.Frame):
             self._load_offense_breakdown(int(def_id))
 
     def _apply_filter(self):
-        query = self._search_var.get().lower().strip()
+        query_raw = self._search_var.get().lower().strip()
+        query_parts = query_raw.split() # Split by space for fuzzy matching
+        tier = self._tier_var.get()
         self.tree.delete(*self.tree.get_children())
         
         filtered_wins = 0
         filtered_total = 0
         
         for r in self._all_rows:
-            comp_lower = (r["comp"] or "").lower()
+            comp_clean = (r["comp"] or "").lower().replace("/", " ") # Remove slashes for matching
             label_lower = (r["label"] or "").lower()
-            if query and query not in comp_lower and query not in label_lower:
+            r_tier = r["tier"] if "tier" in r.keys() else "5*"
+
+            # Tier filter
+            if tier != "All" and r_tier != tier:
+                continue
+
+            # Match ALL parts of the query (Fuzzy)
+            match = True
+            for part in query_parts:
+                if part not in comp_clean and part not in label_lower:
+                    match = False
+                    break
+            
+            if not match:
                 continue
             
             wins_v = r["wins"] or 0; tot = r["total"] or 0
@@ -441,19 +531,14 @@ class DefensesTab(tk.Frame):
             
             wr = winrate_str(wins_v, tot)
             tag = get_wr_tag(wins_v, tot)
-            
             g_wins, g_tot = r["g_wins"] or 0, r["g_total"] or 0
             g_wr = winrate_str(g_wins, g_tot)
             
             self.tree.insert("", "end", tags=(tag,),
                 values=(r["id"], r["label"] or "", r["comp"], wins_v, tot - wins_v, wr, g_wr))
         
-        # Update summary label
-        if query:
-            txt = f"TOTAL VS FILTER:  {winrate_str(filtered_wins, filtered_total)}"
-            self._summary_lbl.config(text=txt)
-        else:
-            self._summary_lbl.config(text="")
+        # Update Donut Chart
+        self._donut.update_stats(filtered_wins, filtered_total)
 
     def _on_select(self, _event=None):
         sel = self.tree.selection()
@@ -502,7 +587,7 @@ class DefensesTab(tk.Frame):
         if def_id is None: return
         row = next((r for r in db.get_defenses() if r["id"] == def_id), None)
         if not row: return
-        dlg = RecordDialog(self, "Edit Defense", initial=(row["label"],row["monster1"],row["monster2"],row["monster3"],row["notes"]))
+        dlg = RecordDialog(self, "Edit Defense", initial=(row["label"],row["monster1"],row["monster2"],row["monster3"],row["notes"],row["tier"]))
         if dlg.result:
             db.update_defense(def_id, *dlg.result); self.refresh(); self.on_change()
 
@@ -646,7 +731,7 @@ class BattleLogTab(tk.Frame):
 
 
     def refresh(self):
-        # Rebuild comboboxes
+        # Rebuild comboboxes (Clean display without IDs)
         defs = db.get_defenses()
         offs = db.get_offenses()
         self._def_map = {}
@@ -654,15 +739,23 @@ class BattleLogTab(tk.Frame):
             comp = r['monster1']
             if r['monster2']: comp += ' / ' + r['monster2']
             if r['monster3']: comp += ' / ' + r['monster3']
-            key = f"[{r['id']}] {comp}"
-            self._def_map[key] = r['id']
+            label = r['label'] or "Unknown"
+            display = f"{label} — {comp}"
+            # Collision handling
+            if display in self._def_map:
+                display = f"{label} ({r['id']}) — {comp}"
+            self._def_map[display] = r['id']
+
         self._off_map = {}
         for r in offs:
             comp = r['monster1']
             if r['monster2']: comp += ' / ' + r['monster2']
             if r['monster3']: comp += ' / ' + r['monster3']
             name = r['label'] or comp
-            self._off_map[f"[{r['id']}] {name} — {comp}"] = r['id']
+            display = f"{name} — {comp}"
+            if display in self._off_map:
+                display = f"{name} ({r['id']}) — {comp}"
+            self._off_map[display] = r['id']
         
         self.def_search.set_all_values(list(self._def_map.keys()))
         self.off_search.set_all_values(list(self._off_map.keys()))
@@ -706,7 +799,7 @@ class BattleLogTab(tk.Frame):
 class DashboardTab(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent, bg=BG)
-        # Header
+        # ── Header
         hdr = tk.Frame(self, bg=BG); hdr.pack(fill="x", padx=20, pady=(18,4))
         tk.Label(hdr, text="📊  Siege Dashboard", bg=BG, fg=FG,
                  font=("Segoe UI", 15, "bold")).pack(side="left")
@@ -732,43 +825,55 @@ class DashboardTab(tk.Frame):
         tk.Label(self, text="Overview of your siege performance.",
                  bg=BG, fg=FG2, font=FONT_SM).pack(anchor="w", padx=20)
 
-        # AI Advisor Tab (Placeholder for Beta)
-        self.ai_advisor_tab = ttk.Frame(self.notebook)
-        self.notebook.add(self.ai_advisor_tab, text=" 🤖 AI Advisor (Coming Soon) ")
-        
-        placeholder = ttk.Label(self.ai_advisor_tab, 
-                               text="AI Advisor is currently in closed testing.\nLook forward to smarter counters in the next update!",
-                               justify="center", font=("Segoe UI", 12))
-        placeholder.pack(expand=True)
-        # Stat cards row
+        # ── Stat Cards Row
         self.stat_frame = tk.Frame(self, bg=BG)
-        self.stat_frame.pack(fill="x", padx=20, pady=(14,16))
+        self.stat_frame.pack(fill="x", padx=20, pady=(14, 16))
 
-        # Section: Hardest Defenses
-        self._section(" 🔴  Hardest Defenses  —  lowest winrate ")
-        lf_d = tk.Frame(self, bg=CARD, highlightthickness=1, highlightbackground=BORDER)
-        lf_d.pack(fill="x", padx=20, pady=(0,12))
+        # ── Tables Area (Side by Side Grid)
+        self.tables_frame = tk.Frame(self, bg=BG)
+        self.tables_frame.pack(fill="both", expand=True, padx=20, pady=(0, 20))
+        self.tables_frame.columnconfigure(0, weight=1)
+        self.tables_frame.columnconfigure(1, weight=1)
+        self.tables_frame.rowconfigure(0, weight=1)
+
+        # ── Hardest Defenses (Left Column)
+        left_col = tk.Frame(self.tables_frame, bg=BG)
+        left_col.grid(row=0, column=0, sticky="nsew", padx=(0, 10))
+        self._section_lbl(left_col, " 🔴  Hardest Defenses ")
+        
+        lf_d = tk.Frame(left_col, bg=CARD, highlightthickness=1, highlightbackground=BORDER)
+        lf_d.pack(fill="both", expand=True, pady=(0,12))
         cols = ("Composition","Last Faced","Battles","Wins","Losses","Win Rate")
         tf, self.def_tree = scrolled_tree(lf_d, cols, heights=7)
-        tf.pack(fill="x", padx=0, pady=0)
-        for col, w in zip(cols, [280,120,70,60,65,120]):
+        tf.pack(fill="both", expand=True)
+        for col, w in zip(cols, [220,110,60,50,55,100]):
             self.def_tree.heading(col, text=col)
             self.def_tree.column(col, width=w, anchor="w" if col in ("Composition","Last Faced") else "center")
 
-        # Section: Best Offenses
-        self._section(" 🟢  Best Offenses  —  highest winrate ")
-        lf_o = tk.Frame(self, bg=CARD, highlightthickness=1, highlightbackground=BORDER)
-        lf_o.pack(fill="x", padx=20, pady=(0,16))
+        # ── Best Offenses (Right Column)
+        right_col = tk.Frame(self.tables_frame, bg=BG)
+        right_col.grid(row=0, column=1, sticky="nsew", padx=(10, 0))
+        self._section_lbl(right_col, " 🟢  Best Offenses ")
+        
+        lf_o = tk.Frame(right_col, bg=CARD, highlightthickness=1, highlightbackground=BORDER)
+        lf_o.pack(fill="both", expand=True, pady=(0,16))
         cols2 = ("Name","Composition","Battles","Wins","Losses","Win Rate")
         tf2, self.off_tree = scrolled_tree(lf_o, cols2, heights=7)
-        tf2.pack(fill="x", padx=0, pady=0)
-        for col, w in zip(cols2, [130,280,70,60,65,120]):
+        tf2.pack(fill="both", expand=True)
+        for col, w in zip(cols2, [110,220,60,50,55,100]):
             self.off_tree.heading(col, text=col)
             self.off_tree.column(col, width=w, anchor="w" if col in ("Name","Composition") else "center")
 
         self.refresh()
         self.status_lbl = tk.Label(self, text="System Ready", bg=BG, fg=FG3, font=("Segoe UI", 8))
         self.status_lbl.pack(side="bottom", anchor="e", padx=20, pady=4)
+
+    def _section_lbl(self, parent, text):
+        row = tk.Frame(parent, bg=BG); row.pack(fill="x", pady=(0,6))
+        pill = tk.Frame(row, bg=CARD2, padx=10, pady=3)
+        pill.pack(side="left")
+        tk.Label(pill, text=text, bg=CARD2, fg=FG2, font=("Segoe UI", 9, "bold")).pack()
+        tk.Frame(row, bg=BORDER, height=1).pack(side="left", fill="x", expand=True, padx=(8,0), pady=6)
 
     def set_status(self, text):
         self.status_lbl.config(text=text)
@@ -787,35 +892,81 @@ class DashboardTab(tk.Frame):
         tk.Frame(row, bg=BORDER, height=1).pack(side="left", fill="x", expand=True, padx=(8,0), pady=6)
 
     def _stat_card(self, parent, title, value, color=ACCENT, sub=None):
+        # The 'color' is now the persistent border color
         outer = tk.Frame(parent, bg=color, padx=2, pady=2)
         inner = tk.Frame(outer, bg=CARD, padx=20, pady=16)
         inner.pack(fill="both", expand=True)
-        tk.Label(inner, text=title.upper(), bg=CARD, fg=FG2,
-                 font=("Segoe UI", 8, "bold")).pack(anchor="w")
-        tk.Label(inner, text=value, bg=CARD, fg=color,
-                 font=("Segoe UI", 26, "bold")).pack(anchor="w", pady=(4,0))
+        
+        l1 = tk.Label(inner, text=title.upper(), bg=CARD, fg=FG2, font=("Segoe UI", 8, "bold"))
+        l1.pack(anchor="w")
+        l2 = tk.Label(inner, text=value, bg=CARD, fg=color, font=("Segoe UI", 26, "bold"))
+        l2.pack(anchor="w", pady=(4,0))
+        l3 = None
         if sub:
-            tk.Label(inner, text=sub, bg=CARD, fg=FG2,
-                     font=("Segoe UI", 8)).pack(anchor="w")
+            l3 = tk.Label(inner, text=sub, bg=CARD, fg=FG2, font=("Segoe UI", 8))
+            l3.pack(anchor="w")
+            
+        glow_color = _HOVER.get(color, _lighten(color))
+
+        def on_enter(e): 
+            outer.config(bg=glow_color)
+            inner.config(bg=CARD2)
+            l1.config(bg=CARD2); l2.config(bg=CARD2)
+            if l3: l3.config(bg=CARD2)
+            
+        def on_leave(e): 
+            outer.config(bg=color)
+            inner.config(bg=CARD)
+            l1.config(bg=CARD); l2.config(bg=CARD)
+            if l3: l3.config(bg=CARD)
+
+        inner.bind("<Enter>", on_enter)
+        inner.bind("<Leave>", on_leave)
+        for w in (l1, l2, l3) if l3 else (l1, l2):
+            w.bind("<Enter>", on_enter)
+            w.bind("<Leave>", on_leave)
+            
         return outer
 
+    def _fade_color(self, widget, start_hex, end_hex, steps=40, current_step=0):
+        if not widget.winfo_exists(): return
+        def hex_to_rgb(h): return tuple(int(h.lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
+        def rgb_to_hex(rgb): return '#%02x%02x%02x' % rgb
+        s_rgb, e_rgb = hex_to_rgb(start_hex), hex_to_rgb(end_hex)
+        new_rgb = tuple(int(s_rgb[i] + (e_rgb[i] - s_rgb[i]) * (current_step / steps)) for i in range(3))
+        widget.config(bg=rgb_to_hex(new_rgb))
+        if current_step < steps:
+            aid = self.after(25, lambda: self._fade_color(widget, start_hex, end_hex, steps, current_step + 1))
+            self._after_ids.append(aid)
+
     def refresh(self):
-        # Stat cards
+        # Cancel any pending refresh tasks to prevent double cards
+        if hasattr(self, "_after_ids"):
+            for aid in self._after_ids:
+                try: self.after_cancel(aid)
+                except: pass
+        self._after_ids = []
+
+        # Clean up existing cards
         for w in self.stat_frame.winfo_children(): w.destroy()
+        
         battles = db.get_battles()
-        total = len(battles)
-        wins = sum(1 for b in battles if b["result"]=="Win")
+        total, wins = len(battles), sum(1 for b in battles if b["result"]=="Win")
         losses = total - wins
         wr_pct = int(wins/total*100) if total else 0
         wr = f"{wr_pct}%" if total else "—"
-        for title, val, clr, sub in [
+
+        cards_data = [
             ("Total Battles", str(total), ACCENT2, "all time"),
             ("Wins",          str(wins),  WIN_CLR,  f"{wr_pct}% win rate"),
             ("Losses",        str(losses),LOSS_CLR, f"{100-wr_pct}% loss rate" if total else ""),
             ("Overall Winrate", wr,       ACCENT,   f"{wins}W / {losses}L"),
-        ]:
+        ]
+        # Simultaneous Fade-in for all cards
+        for title, val, clr, sub in cards_data:
             c = self._stat_card(self.stat_frame, title, val, clr, sub)
             c.pack(side="left", padx=(0,12), fill="both", expand=True)
+            self._fade_color(c, BG, clr, steps=20)
 
         # Defenses table — sorted by winrate asc (hardest)
         self.def_tree.delete(*self.def_tree.get_children())
@@ -1095,8 +1246,8 @@ class SiegeApp(tk.Tk):
         super().__init__()
         db.init_db()
         self.title("Siege Database v2  —  Summoners War")
-        self.geometry("1100x720")
-        self.minsize(900, 600)
+        self.geometry("1300x800")
+        self.minsize(1000, 600)
         self.configure(bg=BG)
         self.protocol("WM_DELETE_WINDOW", self._on_closing)
         self._build_ui()
@@ -1245,8 +1396,19 @@ class SiegeApp(tk.Tk):
                           command=lambda n=name: self._show(n))
             b.pack(side="left")
             self.tab_btns[name] = b
+            
+            # Hover animations
+            b.bind("<Enter>", lambda e, btn=b: btn.config(bg=PANEL, fg=FG))
+            b.bind("<Leave>", lambda e, btn=b, n=name: self._reset_tab_style(n))
 
         self._show("Dashboard")
+
+    def _reset_tab_style(self, name):
+        """Helper for hover animations — ensures active tab stays lit."""
+        if name == self.current_tab:
+            self.tab_btns[name].config(bg=ACCENT_BG, fg=ACCENT)
+        else:
+            self.tab_btns[name].config(bg=SIDE, fg=FG2)
 
     def _show(self, name):
         for n, p in self.pages.items():

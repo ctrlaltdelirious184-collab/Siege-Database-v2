@@ -19,6 +19,7 @@ def init_db():
             monster2 TEXT,
             monster3 TEXT,
             notes TEXT,
+            tier TEXT DEFAULT '5*',
             created_at TEXT DEFAULT (datetime('now','localtime'))
         );
         CREATE TABLE IF NOT EXISTS offenses (
@@ -61,6 +62,12 @@ def init_db():
             SET guild_name = (SELECT label FROM defenses WHERE defenses.id = battles.defense_id)
         """)
     
+    # ── Migration: Add tier to defenses
+    try:
+        c.execute("SELECT tier FROM defenses LIMIT 1")
+    except sqlite3.OperationalError:
+        c.execute("ALTER TABLE defenses ADD COLUMN tier TEXT DEFAULT '5*'")
+
     conn.commit()
     conn.close()
 
@@ -108,11 +115,11 @@ def delete_defense(def_id):
     conn.execute("DELETE FROM defenses WHERE id=?", (def_id,))
     conn.commit(); conn.close()
 
-def update_defense(def_id, label, m1, m2, m3, notes):
+def update_defense(def_id, label, m1, m2, m3, notes, tier='5*'):
     conn = get_conn()
     conn.execute(
-        "UPDATE defenses SET label=?, monster1=?, monster2=?, monster3=?, notes=? WHERE id=?",
-        (label, m1, m2, m3, notes, def_id)
+        "UPDATE defenses SET label=?, monster1=?, monster2=?, monster3=?, notes=?, tier=? WHERE id=?",
+        (label, m1, m2, m3, notes, tier, def_id)
     )
     conn.commit(); conn.close()
 
@@ -210,10 +217,11 @@ def get_defense_stats():
                (SELECT COUNT(*) FROM battles b2 JOIN defenses d2 ON b2.defense_id=d2.id 
                 WHERE d2.monster1=d.monster1 AND d2.monster2=d.monster2 AND d2.monster3=d.monster3) AS g_total,
                (SELECT SUM(CASE WHEN b2.result='Win' THEN 1 ELSE 0 END) FROM battles b2 JOIN defenses d2 ON b2.defense_id=d2.id 
-                WHERE d2.monster1=d.monster1 AND d2.monster2=d.monster2 AND d2.monster3=d.monster3) AS g_wins
+                WHERE d2.monster1=d.monster1 AND d2.monster2=d.monster2 AND d2.monster3=d.monster3) AS g_wins,
+               d.tier
         FROM defenses d
         LEFT JOIN battles b ON d.id=b.defense_id
-        GROUP BY d.id, d.monster1, d.monster2, d.monster3, label
+        GROUP BY d.id, d.monster1, d.monster2, d.monster3, label, d.tier
         ORDER BY total DESC, last_seen DESC
     """).fetchall()
     conn.close(); return rows
@@ -231,6 +239,22 @@ def get_offense_stats():
         GROUP BY o.id
         ORDER BY total DESC
     """).fetchall()
+    conn.close(); return rows
+
+def get_offense_stats_for_defense(def_id):
+    conn = get_conn()
+    rows = conn.execute("""
+        SELECT o.label,
+               o.monster1||COALESCE(' / '||o.monster2,'')||COALESCE(' / '||o.monster3,'') as comp,
+               COUNT(b.id) as total,
+               SUM(CASE WHEN b.result='Win' THEN 1 ELSE 0 END) as wins,
+               SUM(CASE WHEN b.result='Loss' THEN 1 ELSE 0 END) as losses
+        FROM offenses o
+        JOIN battles b ON o.id = b.offense_id
+        WHERE b.defense_id = ?
+        GROUP BY o.id
+        ORDER BY total DESC
+    """, (def_id,)).fetchall()
     conn.close(); return rows
 
 def backup_db():

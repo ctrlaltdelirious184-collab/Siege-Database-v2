@@ -21,6 +21,13 @@ debug.log
 # Plugin / Releases
 SiegeDatabase_v2_Beta.zip
 SiegeDatabase_v2_Beta/
+SiegeDatabase_Beta.zip
+
+# Temp / Backup
+*.py_fixed_*.py
+pyarmor.bug.log
+*.bak
+*.log
 
 # Private Security (License System)
 keygen.py
