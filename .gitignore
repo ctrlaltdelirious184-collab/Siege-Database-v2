@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# Build & Dist
+dist/
+build/
+*.spec
+*.exe
+
+# Siege Database Private Files
+siege.db
+siege.db.bak
+.license
+debug.log
+.devmode
+
+# Plugin / Releases
+SiegeDatabase_v2_Beta.zip
+SiegeDatabase_v2_Beta/
+
+# Private Security (License System)
+keygen.py
+license.py

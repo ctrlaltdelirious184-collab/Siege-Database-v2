@@ -1,0 +1,796 @@
+{
+  "type": "GetGuildSiegeBaseDefenseUnitListPreset",
+  "data": {
+    "command": "GetGuildSiegeBaseDefenseUnitListPreset",
+    "ret_code": 0,
+    "wizard_info_list": [
+      {
+        "wizard_id": 18467231,
+        "channel_uid": 73746996,
+        "wizard_name": "\u03c5\u0274\u0442\u03b9\u0442led",
+        "wizard_level": 100,
+        "rating_id": 3503,
+        "guild_id": 262310
+      },
+      {
+        "wizard_id": 27126623,
+        "channel_uid": 208807304,
+        "wizard_name": "BackDoor2",
+        "wizard_level": 100,
+        "rating_id": 2003,
+        "guild_id": 262310
+      },
+      {
+        "wizard_id": 17895912,
+        "channel_uid": 168219012,
+        "wizard_name": "MacroManage",
+        "wizard_level": 100,
+        "rating_id": 2003,
+        "guild_id": 262310
+      },
+      {
+        "wizard_id": 15759886,
+        "channel_uid": 166142161,
+        "wizard_name": "MiniiC",
+        "wizard_level": 100,
+        "rating_id": 2003,
+        "guild_id": 262310
+      },
+      {
+        "wizard_id": 26365893,
+        "channel_uid": 207258998,
+        "wizard_name": "\u211cAXML",
+        "wizard_level": 100,
+        "rating_id": 2001,
+        "guild_id": 262310
+      }
+    ],
+    "defense_deck_list": [
+      {
+        "deck_id": 36124100,
+        "wizard_id": 18467231,
+        "total_win_count": 10,
+        "total_draw_count": 0,
+        "total_lose_count": 45,
+        "win_count": 0,
+        "draw_count": 0,
+        "lose_count": 1,
+        "total_count": 1,
+        "winning_rate": 0
+      },
+      {
+        "deck_id": 36298821,
+        "wizard_id": 27126623,
+        "total_win_count": 0,
+        "total_draw_count": 0,
+        "total_lose_count": 2,
+        "win_count": 0,
+        "draw_count": 0,
+        "lose_count": 0,
+        "total_count": 0,
+        "winning_rate": 0
+      },
+      {
+        "deck_id": 36372337,
+        "wizard_id": 17895912,
+        "total_win_count": 3,
+        "total_draw_count": 0,
+        "total_lose_count": 11,
+        "win_count": 1,
+        "draw_count": 0,
+        "lose_count": 4,
+        "total_count": 5,
+        "winning_rate": 20
+      },
+      {
+        "deck_id": 36500651,
+        "wizard_id": 15759886,
+        "total_win_count": 0,
+        "total_draw_count": 0,
+        "total_lose_count": 2,
+        "win_count": 0,
+        "draw_count": 0,
+        "lose_count": 0,
+        "total_count": 0,
+        "winning_rate": 0
+      },
+      {
+        "deck_id": 36515446,
+        "wizard_id": 26365893,
+        "total_win_count": 0,
+        "total_draw_count": 0,
+        "total_lose_count": 1,
+        "win_count": 0,
+        "draw_count": 0,
+        "lose_count": 0,
+        "total_count": 0,
+        "winning_rate": 0
+      }
+    ],
+    "defense_unit_list": [
+      {
+        "deck_id": 36124100,
+        "pos_id": 1,
+        "unit_info": {
+          "unit_id": 20228341204,
+          "unit_master_id": 25715,
+          "class": 6,
+          "unit_level": 40,
+          "costume_master_id": 40105,
+          "trans_item_master_id_list": [
+            20016,
+            10100
+          ]
+        }
+      },
+      {
+        "deck_id": 36124100,
+        "pos_id": 2,
+        "unit_info": {
+          "unit_id": 15052121254,
+          "unit_master_id": 16114,
+          "class": 6,
+          "unit_level": 40,
+          "costume_master_id": 24504,
+          "trans_item_master_id_list": [
+            20002,
+            12820
+          ]
+        }
+      },
+      {
+        "deck_id": 36124100,
+        "pos_id": 3,
+        "unit_info": {
+          "unit_id": 29944329997,
+          "unit_master_id": 23515,
+          "class": 6,
+          "unit_level": 40,
+          "costume_master_id": 31305,
+          "trans_item_master_id_list": [
+            20035,
+            12820
+          ]
+        }
+      },
+      {
+        "deck_id": 36298821,
+        "pos_id": 1,
+        "unit_info": {
+          "unit_id": 28401578237,
+          "unit_master_id": 20515,
+          "class": 6,
+          "unit_level": 40,
+          "costume_master_id": 41805,
+          "trans_item_master_id_list": [
+            20018,
+            12817
+          ]
+        }
+      },
+      {
+        "deck_id": 36298821,
+        "pos_id": 2,
+        "unit_info": {
+          "unit_id": 21677514538,
+          "unit_master_id": 19713,
+          "class": 6,
+          "unit_level": 40,
+          "costume_master_id": 0,
+          "trans_item_master_id_list": [
+            12815
+          ]
+        }
+      },
+      {
+        "deck_id": 36298821,
+        "pos_id": 3,
+        "unit_info": {
+          "unit_id": 36915884900,
+          "unit_master_id": 20415,
+          "class": 6,
+          "unit_level": 40,
+          "costume_master_id": 0,
+          "trans_item_master_id_list": [
+            12820,
+            20040
+          ]
+        }
+      },
+      {
+        "deck_id": 36372337,
+        "pos_id": 1,
+        "unit_info": {
+          "unit_id": 20267703870,
+          "unit_master_id": 25715,
+          "class": 6,
+          "unit_level": 40,
+          "costume_master_id": 40105,
+          "trans_item_master_id_list": [
+            20018,
+            12815
+          ]
+        }
+      },
+      {
+        "deck_id": 36372337,
+        "pos_id": 2,
+        "unit_info": {
+          "unit_id": 7308252332,
+          "unit_master_id": 14034,
+          "class": 6,
+          "unit_level": 40,
+          "costume_master_id": 0,
+          "trans_item_master_id_list": []
+        }
+      },
+      {
+        "deck_id": 36372337,
+        "pos_id": 3,
+        "unit_info": {
+          "unit_id": 25802208601,
+          "unit_master_id": 24515,
+          "class": 6,
+          "unit_level": 40,
+          "costume_master_id": 34305,
+          "trans_item_master_id_list": [
+            12819
+          ]
+        }
+      },
+      {
+        "deck_id": 36500651,
+        "pos_id": 1,
+        "unit_info": {
+          "unit_id": 25614864105,
+          "unit_master_id": 25715,
+          "class": 6,
+          "unit_level": 40,
+          "costume_master_id": 40105,
+          "trans_item_master_id_list": [
+            12811
+          ]
+        }
+      },
+      {
+        "deck_id": 36500651,
+        "pos_id": 2,
+        "unit_info": {
+          "unit_id": 23306246290,
+          "unit_master_id": 27411,
+          "class": 6,
+          "unit_level": 40,
+          "costume_master_id": 0,
+          "trans_item_master_id_list": []
+        }
+      },
+      {
+        "deck_id": 36500651,
+        "pos_id": 3,
+        "unit_info": {
+          "unit_id": 18630137489,
+          "unit_master_id": 23515,
+          "class": 6,
+          "unit_level": 40,
+          "costume_master_id": 31305,
+          "trans_item_master_id_list": [
+            12400,
+            20018
+          ]
+        }
+      },
+      {
+        "deck_id": 36515446,
+        "pos_id": 1,
+        "unit_info": {
+          "unit_id": 34660348614,
+          "unit_master_id": 25715,
+          "class": 6,
+          "unit_level": 40,
+          "costume_master_id": 44705,
+          "trans_item_master_id_list": [
+            12808
+          ]
+        }
+      },
+      {
+        "deck_id": 36515446,
+        "pos_id": 2,
+        "unit_info": {
+          "unit_id": 21494843849,
+          "unit_master_id": 19713,
+          "class": 6,
+          "unit_level": 40,
+          "costume_master_id": 46403,
+          "trans_item_master_id_list": []
+        }
+      },
+      {
+        "deck_id": 36515446,
+        "pos_id": 3,
+        "unit_info": {
+          "unit_id": 23859404877,
+          "unit_master_id": 26111,
+          "class": 6,
+          "unit_level": 40,
+          "costume_master_id": 0,
+          "trans_item_master_id_list": []
+        }
+      }
+    ],
+    "defense_unit_equip_info_summary": [
+      [
+        20228341204,
+        6,
+        6,
+        2
+      ],
+      [
+        15052121254,
+        6,
+        6,
+        2
+      ],
+      [
+        29944329997,
+        6,
+        6,
+        2
+      ],
+      [
+        28401578237,
+        6,
+        6,
+        2
+      ],
+      [
+        21677514538,
+        6,
+        6,
+        2
+      ],
+      [
+        36915884900,
+        6,
+        6,
+        2
+      ],
+      [
+        20267703870,
+        6,
+        6,
+        2
+      ],
+      [
+        7308252332,
+        6,
+        6,
+        2
+      ],
+      [
+        25802208601,
+        6,
+        6,
+        2
+      ],
+      [
+        25614864105,
+        6,
+        6,
+        2
+      ],
+      [
+        23306246290,
+        6,
+        6,
+        2
+      ],
+      [
+        18630137489,
+        6,
+        6,
+        2
+      ],
+      [
+        34660348614,
+        6,
+        6,
+        2
+      ],
+      [
+        21494843849,
+        6,
+        6,
+        2
+      ],
+      [
+        23859404877,
+        6,
+        6,
+        2
+      ]
+    ],
+    "defense_deck_assign_list": [
+      {
+        "base_number": 12,
+        "deck_id": 36124100
+      },
+      {
+        "base_number": 12,
+        "deck_id": 36298821
+      },
+      {
+        "base_number": 12,
+        "deck_id": 36372337
+      },
+      {
+        "base_number": 12,
+        "deck_id": 36500651
+      },
+      {
+        "base_number": 12,
+        "deck_id": 36515446
+      }
+    ],
+    "defense_skill_option_list": {
+      "35990126": [
+        {
+          "pos_id": 2,
+          "option": [
+            1,
+            0
+          ]
+        }
+      ],
+      "35990273": [
+        {
+          "pos_id": 2,
+          "option": [
+            2
+          ]
+        }
+      ],
+      "36124078": [
+        {
+          "pos_id": 2,
+          "option": [
+            2
+          ]
+        }
+      ],
+      "36124100": [
+        {
+          "pos_id": 2,
+          "option": [
+            2
+          ]
+        }
+      ],
+      "36124144": [
+        {
+          "pos_id": 3,
+          "option": [
+            1,
+            0
+          ]
+        }
+      ],
+      "36124177": [
+        {
+          "pos_id": 2,
+          "option": [
+            1
+          ]
+        }
+      ],
+      "36152421": [
+        {
+          "pos_id": 2,
+          "option": [
+            2,
+            0
+          ]
+        }
+      ],
+      "36241975": [],
+      "36241987": [
+        {
+          "pos_id": 2,
+          "option": [
+            1,
+            0
+          ]
+        }
+      ],
+      "36292564": [
+        {
+          "pos_id": 2,
+          "option": [
+            2,
+            0
+          ]
+        }
+      ],
+      "36292773": [
+        {
+          "pos_id": 1,
+          "option": [
+            1,
+            0
+          ]
+        }
+      ],
+      "36293544": [],
+      "36293634": [
+        {
+          "pos_id": 2,
+          "option": [
+            2
+          ]
+        }
+      ],
+      "36298471": [],
+      "36298821": [
+        {
+          "pos_id": 2,
+          "option": [
+            2,
+            0
+          ]
+        }
+      ],
+      "36298824": [
+        {
+          "pos_id": 2,
+          "option": [
+            2,
+            0
+          ]
+        }
+      ],
+      "36298846": [
+        {
+          "pos_id": 3,
+          "option": [
+            2,
+            0
+          ]
+        }
+      ],
+      "36298865": [],
+      "36314848": [
+        {
+          "pos_id": 3,
+          "option": [
+            2,
+            0
+          ]
+        }
+      ],
+      "36319616": [
+        {
+          "pos_id": 2,
+          "option": [
+            2
+          ]
+        }
+      ],
+      "36340585": [
+        {
+          "pos_id": 2,
+          "option": [
+            2,
+            0
+          ]
+        }
+      ],
+      "36345706": [
+        {
+          "pos_id": 2,
+          "option": [
+            2,
+            0
+          ]
+        }
+      ],
+      "36345785": [
+        {
+          "pos_id": 3,
+          "option": [
+            1,
+            0
+          ]
+        }
+      ],
+      "36372337": [
+        {
+          "pos_id": 2,
+          "option": [
+            1
+          ]
+        }
+      ],
+      "36372342": [
+        {
+          "pos_id": 2,
+          "option": [
+            2,
+            0
+          ]
+        }
+      ],
+      "36443723": [
+        {
+          "pos_id": 3,
+          "option": [
+            1,
+            0
+          ]
+        }
+      ],
+      "36443726": [
+        {
+          "pos_id": 2,
+          "option": [
+            1,
+            0
+          ]
+        }
+      ],
+      "36443732": [
+        {
+          "pos_id": 2,
+          "option": [
+            2,
+            0
+          ]
+        }
+      ],
+      "36443935": [
+        {
+          "pos_id": 2,
+          "option": [
+            2
+          ]
+        }
+      ],
+      "36443990": [
+        {
+          "pos_id": 2,
+          "option": [
+            1
+          ]
+        }
+      ],
+      "36449253": [
+        {
+          "pos_id": 2,
+          "option": [
+            1,
+            0
+          ]
+        }
+      ],
+      "36449258": [
+        {
+          "pos_id": 2,
+          "option": [
+            2,
+            0
+          ]
+        }
+      ],
+      "36449276": [
+        {
+          "pos_id": 2,
+          "option": [
+            2
+          ]
+        }
+      ],
+      "36449346": [
+        {
+          "pos_id": 2,
+          "option": [
+            2,
+            0
+          ]
+        }
+      ],
+      "36455746": [
+        {
+          "pos_id": 2,
+          "option": [
+            1,
+            0
+          ]
+        }
+      ],
+      "36472600": [
+        {
+          "pos_id": 2,
+          "option": [
+            2
+          ]
+        }
+      ],
+      "36500648": [
+        {
+          "pos_id": 2,
+          "option": [
+            1
+          ]
+        }
+      ],
+      "36500649": [
+        {
+          "pos_id": 2,
+          "option": [
+            1,
+            0
+          ]
+        }
+      ],
+      "36500651": [
+        {
+          "pos_id": 2,
+          "option": [
+            2
+          ]
+        }
+      ],
+      "36500654": [
+        {
+          "pos_id": 3,
+          "option": [
+            1
+          ]
+        }
+      ],
+      "36500655": [
+        {
+          "pos_id": 3,
+          "option": [
+            1,
+            0
+          ]
+        }
+      ],
+      "36500725": [
+        {
+          "pos_id": 3,
+          "option": [
+            1,
+            0
+          ]
+        }
+      ],
+      "36506619": [
+        {
+          "pos_id": 2,
+          "option": [
+            1,
+            0
+          ]
+        }
+      ],
+      "36513909": [
+        {
+          "pos_id": 2,
+          "option": [
+            1
+          ]
+        }
+      ],
+      "36515446": []
+    },
+    "assign_sequence_list": [],
+    "ts_val": 1982481065,
+    "tvalue": 1778730017,
+    "tvaluelocal": 1778672417,
+    "tzone": "America/Los_Angeles",
+    "tzoffset": -25200,
+    "reqid": "898d257b-b03b-4a19-9fb9-44960a185e7b",
+    "this_server_id": 4
+  }
+}
