@@ -31,4 +31,5 @@ pyarmor.bug.log
 
 # Private Security (License System)
 keygen.py
-license.py
+beta_keys_v2.txt
+license_keys.txt
