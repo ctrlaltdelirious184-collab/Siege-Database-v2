@@ -70,13 +70,14 @@ class _IngestHandler(BaseHTTPRequestHandler):
                 # Only process if scouting is enabled
                 if db.get_setting("auto_discovery", "True") == "True":
                     count = importer.process_discovery(packet.get("type"), packet.get("data"))
-                    self._json(200, {"status": "ok", "count": count})
+                    res = {"status": "ok", "count": count}
+                    self._json(200, res)
                     
                     # Refresh UI to show newly discovered defenses
                     if _refresh_callback:
                         _refresh_callback()
                     if _discovery_callback:
-                        _discovery_callback(count)
+                        _discovery_callback(res)
                 else:
                     self._json(200, {"status": "disabled"})
             except Exception as e:

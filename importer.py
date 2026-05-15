@@ -431,7 +431,7 @@ def process_live_battle(entry: dict, wizard_name: str = "") -> dict:
     if wizard_name:
         entry_wiz = (entry.get("wizard_name") or "").strip().lower()
         if entry_wiz and entry_wiz != wizard_name.strip().lower():
-            return {"status": "skipped", "reason": "wizard_name mismatch"}
+            return {"status": "skipped", "reason": f"wizard_name mismatch: '{entry_wiz}' vs '{wizard_name}'"}
 
     log_id = str(entry.get("log_id", ""))
 
