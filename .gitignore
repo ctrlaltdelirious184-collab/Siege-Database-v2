@@ -33,3 +33,6 @@ pyarmor.bug.log
 keygen.py
 beta_keys_v2.txt
 license_keys.txt
+src_backups/
+dist/
+__pycache__/

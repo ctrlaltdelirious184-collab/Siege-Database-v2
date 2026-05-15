@@ -1494,15 +1494,12 @@ class SiegeApp(tk.Tk):
         self.ai_tab.refresh()
 
 if __name__ == "__main__":
-    # ── License gate (bypassed in dev mode)
-    import os as _os
-    _dev_mode = _os.path.exists(_os.path.join(_os.path.dirname(_os.path.abspath(__file__)), ".devmode"))
-    if not _dev_mode and not lic.is_licensed():
-        gate = LicenseWindow()
-        gate.mainloop()
-        if not gate.activated:
-            # User closed without activating
-            import sys; sys.exit(0)
-    # ── Launch main app
-    app = SiegeApp()
-    app.mainloop()
+    import base64 as _b, os as _o, sys as _s
+    _p = _o.path.join(_o.path.dirname(_o.path.abspath(__file__)), ".devmode")
+    # Base64 of: 
+    # if not _o.path.exists(_p) and not lic.is_licensed():
+    #     gate = LicenseWindow(); gate.mainloop()
+    #     if not gate.activated: _s.exit(0)
+    # app = SiegeApp(); app.mainloop()
+    _c = "aW1wb3J0IGxpY2Vuc2UgYXMgbGljCmlmIG5vdCBfby5wYXRoLmV4aXN0cyhfcCkgYW5kIG5vdCBsaWMuaXNfbGljZW5zZWQoKToKICAgIGdhdGUgPSBMaWNlbnNlV2luZG93KCkKICAgIGdhdGUubWFpbmxvb3AoKQogICAgaWYgbm90IGdhdGUuYWN0aXZhdGVkOiBfcy5leGl0KDApCmFwcCA9IFNpZWdlQXBwKCkKYXBwLm1haW5sb29wKCk="
+    exec(_b.b64decode(_c))
